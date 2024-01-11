@@ -1,0 +1,2 @@
+#define FRAMERATE 12
+#define OVERCLOCK 1

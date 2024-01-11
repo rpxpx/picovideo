@@ -1,0 +1,4 @@
+
+#define PICO_SRAM 264000
+#define FREE_SRAM 200000
+

@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# makevideo.sh FRAMERATE [COMPRESSION:0,1,2] [OVERCLOCK:0,1] IMAGES...
+#
+# Available clockspeeds: check src/rp2_common/hardware_clocks/scripts/vcocalc.py  
+
+
+# Check for necessary defd path variables.
+# If not defined, try to define with find()
+if [ -z ${PICO_SDK_PATH+x} ]; then
+  echo "PICO_SDK_PATH undefined, attempting to find."
+  export PICO_SDK_PATH=$(./shortestarg $(find ~ -type d -name pico-sdk))
+  echo $PICO_SDK_PATH
+fi 
+if [ -z ${PICO_LCD_PATH+x} ]; then
+  echo "PICO_LCD_PATH undefined, attempting to find."
+  export PICO_LCD_PATH=$(./shortestarg $(find ~ -type d -name Pico_LCD_code))
+  echo $PICO_LCD_PATH
+fi 
+if [ -z ${ZLIB_RP2XX+x} ]; then
+  echo "ZLIB_RP2XX undefined, attempting to find."
+  export ZLIB_RP2XX=$(./shortestarg $(find ~ -type d -name zlib-rp2xx))
+  echo $ZLIB_RP2XX
+fi 
+
+
+# Framerate
+re='^[+]?[0-9]+([.][0-9]+)?$'
+if [[ $1 == "" ]] || [[ $1 == "0" ]] || ! [[ $1 =~ $re ]]; then
+  echo "error: framerate not a number" >&2
+  echo "usage: makevideo.sh FRAMERATE MODE [OVERCLOCK] [images]" >&2
+  exit 1
+fi
+echo "* Requested framerate: "$1" fps"
+echo "#define FRAMERATE "$1 > ./Framerate.h
+
+
+if [[ $2 == "" ]] || [[ $2 != "0" ]] && [[ $2 != "1" ]] && [[ $2 != "2" ]]; then
+  echo "error: Invalid compilation mode." >&2 
+  echo "0: Raw data. Largest binary size, highest framerate." >&2
+  echo "1: Single frame compression." >&2
+  echo "2: Blokweave compression. Highest possible compression. Smallest binary, lowest framerate." >&2
+  echo "usage: makevideo.sh FRAMERATE MODE [OVERCLOCK] [images]" >&2
+  exit 1
+fi
+echo "* Choosing frame compilation mode: "$2
+
+
+# Overclock options
+re='^[0-9]+$'
+if [[ $3 =~ $re ]]; then
+  imgparam=4
+  if [[ $3 == "0" ]]; then
+    overclock="0"
+  else
+    overclock="1"
+  fi
+else
+  overclock="0"
+  imgparam=3
+fi
+if [[ $overclock == "0" ]]; then
+  echo "* Standard processor speed: 133 MHz"
+else
+  echo "* Overclocking processor: 225 MHz"
+fi
+echo "#define OVERCLOCK "$overclock >> ./Framerate.h
+
+echo
+
+echo "* Compiling images into ImageDataRaw.c and ImageDataRaw.h byte array files..."
+if [[ "" == "${@:$imgparam}" ]]; then
+  python3 ./bytearray.py ../imgs/*
+else
+  python3 ./bytearray.py ${@:imgparam}
+fi
+
+
+
+# Choose compression method.
+if [ $2 == "2" ]; then
+  echo "* Blokweave compression. Compiling compress-blokweave.c with ImageDataRaw.h and outputting compressed ImageDataBlokZ.h..."
+  gcc compress-blokweav.c ImageDataRaw.c weave.c primed.c -lm -lz && ./a.out && rm a.out
+  touch ImageDataZ.h
+  
+elif [ $2 == "1" ]; then
+  echo "* Single frame compression. Compiling compress-simpl.c with ImageDataRaw.h and outputting compressed ImageDataZ.h..."
+  gcc compress-singlefr.c ImageDataRaw.c -lz && ./a.out && rm a.out
+  touch ImageDataBlokZ.h
+else
+  touch ImageDataBlokZ.h 
+  touch ImageDataZ.h 
+fi
+
+echo "* Moving ImageData files to ./screens for compilation."
+mv ImageData*.[ch] ./screens
+
+echo "* Entering ./build and compiling..."
+cd ./build
+cmake ..
+make
+
+cd ..
+echo "* Moving video.uf2 to base directory."
+mv ./build/video.uf2 ./
+
