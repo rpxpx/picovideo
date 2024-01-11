@@ -9,17 +9,17 @@
 # If not defined, try to define with find()
 if [ -z ${PICO_SDK_PATH+x} ]; then
   echo "PICO_SDK_PATH undefined, attempting to find."
-  export PICO_SDK_PATH=$(./shortestarg $(find ~ -type d -name pico-sdk))
+  export PICO_SDK_PATH=$(./shortest $(find ~ -type d -name pico-sdk))
   echo $PICO_SDK_PATH
 fi 
 if [ -z ${PICO_LCD_PATH+x} ]; then
   echo "PICO_LCD_PATH undefined, attempting to find."
-  export PICO_LCD_PATH=$(./shortestarg $(find ~ -type d -name Pico_LCD_code))
+  export PICO_LCD_PATH=$(./shortest $(find ~ -type d -name Pico_LCD_code))
   echo $PICO_LCD_PATH
 fi 
 if [ -z ${ZLIB_RP2XX+x} ]; then
   echo "ZLIB_RP2XX undefined, attempting to find."
-  export ZLIB_RP2XX=$(./shortestarg $(find ~ -type d -name zlib-rp2xx))
+  export ZLIB_RP2XX=$(./shortest $(find ~ -type d -name zlib-rp2xx))
   echo $ZLIB_RP2XX
 fi 
 
@@ -95,7 +95,11 @@ fi
 echo "* Moving ImageData files to ./screens for compilation."
 mv ImageData*.[ch] ./screens
 
+
 echo "* Entering ./build and compiling..."
+if [ ! -d "$build" ]; then
+  mkdir build
+fi
 cd ./build
 cmake ..
 make
