@@ -11,6 +11,7 @@ if [ -z ${PICO_SDK_PATH+x} ]; then
   echo "PICO_SDK_PATH undefined, attempting to find."
   export PICO_SDK_PATH=$(./shortest $(find ~ -type d -name pico-sdk))
   echo $PICO_SDK_PATH
+  cp $PICO_SDK_PATH/external/pico_sdk_import.cmake ./
 fi 
 if [ -z ${PICO_LCD_PATH+x} ]; then
   echo "PICO_LCD_PATH undefined, attempting to find."
@@ -22,6 +23,7 @@ if [ -z ${ZLIB_RP2XX+x} ]; then
   export ZLIB_RP2XX=$(./shortest $(find ~ -type d -name zlib-rp2xx))
   echo $ZLIB_RP2XX
 fi 
+
 
 
 # Framerate
@@ -97,9 +99,7 @@ mv ImageData*.[ch] ./screens
 
 
 echo "* Entering ./build and compiling..."
-if [ ! -d "$build" ]; then
-  mkdir build
-fi
+[ ! -d "$build" ] && mkdir build  
 cd ./build
 cmake ..
 make

@@ -27,9 +27,6 @@ export PICO_SDK_PATH=/path/to/pico-sdk
 export PICO_LCD_PATH=/path/to/Pico_LCD_code 
 export ZLIB_RP2XX=/path/to/zlib-rp2xx 
 
-* Copy pico_sdk_import.cmake from /path/to/pico-sdk/external/ into picovideo folder.
-
-
 
 
 ## USAGE
