@@ -43,9 +43,9 @@ echo $ZLIB_RP2XX_PATH
 
 # Write results to set_vars
 if [[ $ENV_VARS_EDIT == 1 ]]; then    
-    echo "export PICO_SDK_PATH=$PICO_SDK_PATH" > env_vars
-    echo "export PICO_LCD_PATH=$PICO_LCD_PATH" >> env_vars
-    echo "export ZLIB_RP2XX_PATH=$ZLIB_RP2XX_PATH" >> env_vars
+    echo "PICO_SDK_PATH=$PICO_SDK_PATH" > env_vars
+    echo "PICO_LCD_PATH=$PICO_LCD_PATH" >> env_vars
+    echo "ZLIB_RP2XX_PATH=$ZLIB_RP2XX_PATH" >> env_vars
 fi
 
 
@@ -99,13 +99,13 @@ echo
 
 echo "* Compiling images into ImageDataRaw.c and ImageDataRaw.h byte array files..."
 if [[ "" == "${@:$imgparam}" ]]; then
-  if [[ ! -d ../imgs/ || $(ls -1 ../imgs/|wc -l) == "0" ]]; then
-    python3 bytearray.py ./imgs/*
-  else
-    python3 bytearray.py ../imgs/*
-  fi
+    if [[ ! -d ../imgs/ || -z $(ls -A ../imgs/) ]]; then
+	python3 bytearray.py ./imgs/*
+    else
+	python3 bytearray.py ../imgs/*
+    fi
 else
-  python3 bytearray.py ${@:imgparam}
+    python3 bytearray.py ${@:imgparam}
 fi
 
 

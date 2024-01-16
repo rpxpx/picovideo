@@ -4,10 +4,6 @@
  *
  */ 
 
-// TO DO:
-// switch longs to unsigned longs;
-
-
 #ifndef _PRIMED_H_
 #define _PRIMED_H_
 
@@ -17,6 +13,8 @@
 #include <math.h>
 #include <time.h>
 
+
+typedef unsigned int uint;
 typedef unsigned long ulong;
 
 
