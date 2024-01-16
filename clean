@@ -2,4 +2,6 @@
 rm -rf ./build
 rm ./screens/ImageData*.[ch]
 rm Framerate.h
-rm ./video.uf2
+rm video.uf2
+rm pico_sdk_import.cmake
+cp env_vars.empty env_vars
