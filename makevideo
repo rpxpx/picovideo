@@ -6,24 +6,47 @@
 
 
 # Check for necessary defd path variables.
-# If not defined, try to define with find()
-if [ -z ${PICO_SDK_PATH+x} ]; then
-  echo "PICO_SDK_PATH undefined, attempting to find."
-  export PICO_SDK_PATH=$(./shortest $(find ~ -type d -name pico-sdk))
-  echo $PICO_SDK_PATH
-  cp $PICO_SDK_PATH/external/pico_sdk_import.cmake ./
+if [[ -e env_vars ]]; then
+    export $(grep PICO_SDK_PATH env_vars)
+    export $(grep PICO_LCD_PATH env_vars)
+    export $(grep ZLIB_RP2XX_PATH env_vars)
+    ENV_VARS_EDIT=0
+fi
+
+# If undefined or not a DIR, try to find with find() in $HOME
+if [[ -z ${PICO_SDK_PATH+x} || ! -d $PICO_SDK_PATH ]]; then
+    ENV_VARS_EDIT=1
+    echo "PICO_SDK_PATH undefined, attempting to find in $HOME..."    
+    export PICO_SDK_PATH=$(./shortest $(find ~ -type d -name pico-sdk 2>/dev/null))      
+fi
+if [[ -z ${PICO_LCD_PATH+x} || ! -d $PICO_LCD_PATH ]]; then
+    ENV_VARS_EDIT=1
+    echo "PICO_LCD_PATH undefined, attempting to find in $HOME..."
+    export PICO_LCD_PATH=$(./shortest $(find ~ -type d -name Pico_LCD_code 2>/dev/null))
 fi 
-if [ -z ${PICO_LCD_PATH+x} ]; then
-  echo "PICO_LCD_PATH undefined, attempting to find."
-  export PICO_LCD_PATH=$(./shortest $(find ~ -type d -name Pico_LCD_code))
-  echo $PICO_LCD_PATH
-fi 
-if [ -z ${ZLIB_RP2XX+x} ]; then
-  echo "ZLIB_RP2XX undefined, attempting to find."
-  export ZLIB_RP2XX=$(./shortest $(find ~ -type d -name zlib-rp2xx))
-  echo $ZLIB_RP2XX
+if [[ -z ${ZLIB_RP2XX_PATH+x} || ! -d $ZLIB_RP2XX_PATH ]]; then
+    ENV_VARS_EDIT=1
+    echo "ZLIB_RP2XX_PATH undefined, attempting to find in $HOME..."
+    export ZLIB_RP2XX_PATH=$(./shortest $(find ~ -type d -name zlib-rp2xx 2>/dev/null))
 fi 
 
+if [[ ! -d $PICO_SDK_PATH || ! -d $PICO_LCD_PATH || ! -d $ZLIB_RP2XX_PATH ]]; then
+    echo "error: Library paths undefined"
+    exit 1
+fi
+
+echo $PICO_SDK_PATH
+echo "* Attempting to copy pico_sdk_import.cmake"
+cp $PICO_SDK_PATH/external/pico_sdk_import.cmake ./
+echo $PICO_LCD_PATH
+echo $ZLIB_RP2XX_PATH
+
+# Write results to set_vars
+if [[ $ENV_VARS_EDIT == 1 ]]; then    
+    echo "export PICO_SDK_PATH=$PICO_SDK_PATH" > env_vars
+    echo "export PICO_LCD_PATH=$PICO_LCD_PATH" >> env_vars
+    echo "export ZLIB_RP2XX_PATH=$ZLIB_RP2XX_PATH" >> env_vars
+fi
 
 
 # Framerate
@@ -48,6 +71,7 @@ fi
 echo "* Choosing frame compilation mode: "$2
 
 
+
 # Overclock options
 re='^[0-9]+$'
 if [[ $3 =~ $re ]]; then
@@ -70,13 +94,19 @@ echo "#define OVERCLOCK "$overclock >> ./Framerate.h
 
 echo
 
+
+# Selecting image set
+
 echo "* Compiling images into ImageDataRaw.c and ImageDataRaw.h byte array files..."
 if [[ "" == "${@:$imgparam}" ]]; then
-  python3 ./bytearray.py ../imgs/*
+  if [[ ! -d ../imgs/ || $(ls -1 ../imgs/|wc -l) == "0" ]]; then
+    python3 bytearray.py ./imgs/*
+  else
+    python3 bytearray.py ../imgs/*
+  fi
 else
-  python3 ./bytearray.py ${@:imgparam}
+  python3 bytearray.py ${@:imgparam}
 fi
-
 
 
 # Choose compression method.
@@ -104,7 +134,10 @@ cd ./build
 cmake ..
 make
 
+if [ -e video.uf2 ]; then
+    echo "* Moving video.uf2 to base directory."
+    mv video.uf2 ..
+else
+    echo "error: Failed to compile video."    
+fi
 cd ..
-echo "* Moving video.uf2 to base directory."
-mv ./build/video.uf2 ./
-

@@ -1,7 +1,5 @@
 #!/bin/bash 
-
 rm -rf ./build
 rm ./screens/ImageData*.[ch]
 rm Framerate.h
 rm ./video.uf2
-

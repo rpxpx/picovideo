@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.13)
 # Environmental variable DIR constants that must be defined:
 # PICO_SDK_PATH
 # PICO_LCD_PATH 
-# ZLIB_RP2XX 
+# ZLIB_RP2XX_PATH
 
 # DIR constants.
 # Initialize SDK based on PICO_SDK_PATH
@@ -18,7 +18,7 @@ pico_sdk_init()
 # Include root directory to make data and framerate files available
 include_directories(./)
 
-include($ENV{ZLIB_RP2XX}/interfaceLibForPicoSDK.cmake)
+include($ENV{ZLIB_RP2XX_PATH}/interfaceLibForPicoSDK.cmake)
 
 set(PICO_LCD_CODE $ENV{PICO_LCD_PATH}/c)
 

@@ -6,32 +6,30 @@ Drive short looping gif-like video with Pico on LCD display.
 
 ## INSTALLATION
 
-* Dependencies: gcc make cmake python3 gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+- Dependencies: python3 gcc make cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
 
-* python3 libraries: numpy matplotlib opencv 
+- Libraries for python3: numpy matplotlib
 
-* Install Raspberry Pi Pico SDK:
-https://github.com/raspberrypi/pico-sdk
+- Install Pico SDK:
+[https://github.com/raspberrypi/pico-sdk](https://github.com/raspberrypi/pico-sdk)
 
-* Install Wavepath Pico LCD libraries:
-https://files.waveshare.com/upload/2/28/Pico_code.7z
-(For technical info, see also: 
-https://www.waveshare.com/wiki/Pico-LCD-1.8)
+- Install Wavepath Pico LCD libraries:
+[https://files.waveshare.com/upload/2/28/Pico_code.7z](https://files.waveshare.com/upload/2/28/Pico_code.7z)
+For technical info, see: [https://www.waveshare.com/wiki/Pico-LCD-1.8](https://www.waveshare.com/wiki/Pico-LCD-1.8)
 
-* Install zlib for rp2xx:
-https://github.com/kripton/zlib/tree/rp2xx
+- Install zlib for rp2xx:
+[https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
 
-* Define environmental DIR constants, e.g. in ~/.bashrc:
+- Define directory constants for those libraries in env_vars: 
+`PICO_SDK_PATH=/path/to/pico-sdk`
+`PICO_LCD_PATH=/path/to/Pico_LCD_code`
+`ZLIB_RP2XX=/path/to/zlib-rp2xx`
 
-export PICO_SDK_PATH=/path/to/pico-sdk
-export PICO_LCD_PATH=/path/to/Pico_LCD_code 
-export ZLIB_RP2XX=/path/to/zlib-rp2xx 
-
-
+---
 
 ## USAGE
 
-   $ ./makevideo FRAMERATE COMPRESSION-MODE [OVERCLOCK] [images]
+>$ ./makevideo FRAMERATE COMPRESSION-MODE [OVERCLOCK] [images]
 
 Output appears in picovdeo as video.uf2. Copy this to Pico flash.
 
@@ -43,4 +41,3 @@ Compression modes:
 Overclock modes:
 0: Standard processor speed: 133 MHz.
 1: Overclock processor: 225 MHz.
-

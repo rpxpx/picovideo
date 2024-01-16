@@ -17,6 +17,9 @@
 #include <math.h>
 #include <time.h>
 
+typedef unsigned long ulong;
+
+
 // Integer array
 struct inta{
   int *a;
