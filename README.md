@@ -24,10 +24,10 @@ For technical info, see: [https://www.waveshare.com/wiki/Pico-LCD-1.8](https://w
 Library folder should be named zlib-rp2xx
 [https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
 
-- Define directory constants for those libraries in env_vars: 
-`PICO_SDK_PATH=/path/to/pico-sdk<br>
- PICO_LCD_PATH=/path/to/Pico_LCD_code<br>
- ZLIB_RP2XX=/path/to/zlib-rp2xx`
+- Define directory constants for those libraries in env_vars:
+  `PICO_SDK_PATH=/path/to/pico-sdk`<br>
+  `PICO_LCD_PATH=/path/to/Pico_LCD_code`<br>
+  `ZLIB_RP2XX=/path/to/zlib-rp2xx`
 
 ---
 
