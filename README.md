@@ -1,7 +1,7 @@
 
 # picovideo
 
-Drive short looping gif-like videos with the Pico microcontroller on small LCD displays. Working on Nokia-like 1.8" LCD screens.
+Drive short looping gif-like videos with the Pico microcontroller on small LCD displays. Working on Nokia-like 1.8" LCD screens.<br>
 Supply video frames as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash. Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
 
 
@@ -25,8 +25,8 @@ Library folder should be named zlib-rp2xx
 [https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
 
 - Define directory constants for those libraries in env_vars: 
-`PICO_SDK_PATH=/path/to/pico-sdk
- PICO_LCD_PATH=/path/to/Pico_LCD_code
+`PICO_SDK_PATH=/path/to/pico-sdk<br>
+ PICO_LCD_PATH=/path/to/Pico_LCD_code<br>
  ZLIB_RP2XX=/path/to/zlib-rp2xx`
 
 ---
@@ -37,17 +37,17 @@ Library folder should be named zlib-rp2xx
 
 Output appears in picovdeo as video.uf2. Copy this to Pico flash.
 
-Compression modes:
-0: Raw data. Largest binary size, highest framerate.
-1: Single frame compression.
-2: Blokweave compression. Highest possible compression. Smallest binary, lowest framerate.
+Compression modes:<br>
+0: Raw data. Largest binary size, highest framerate.<br>
+1: Single frame compression.<br>
+2: Blokweave compression. Highest possible compression. Smallest binary, lowest framerate.<p>
 
-Overclock modes:
-0: Standard processor speed: 133 MHz.
+Overclock modes:<br>
+0: Standard processor speed: 133 MHz.<br>
 1: Overclock processor: 225 MHz.
 
 ---
 
-Maximum binary size is ~4.2MB. Video compilation will fail if binary size would exceed this.
-In mode 0, with no compression, 49 160x130 pixel frames can be compiled into video.
-Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on.
+Maximum binary size is ~4.2MB. Video compilation will fail if binary size would exceed this.<br>
+In mode 0, with no compression, 49 160x130 pixel frames can be compiled into video.<br>
+Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on.<br>
