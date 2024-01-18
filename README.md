@@ -1,8 +1,8 @@
 
 # picovideo
 
-Drive short looping gif-like videos with the Pico microcontroller on small LCD displays.
-Working on 1.8" LCD screens.
+Drive short looping gif-like videos with the Pico microcontroller on small LCD displays. Working on Nokia-like 1.8" LCD screens.
+Supply video frames as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash. Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
 
 
 ## INSTALLATION
@@ -25,9 +25,9 @@ Library folder should be named zlib-rp2xx
 [https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
 
 - Define directory constants for those libraries in env_vars: 
-`PICO_SDK_PATH=/path/to/pico-sdk`
-`PICO_LCD_PATH=/path/to/Pico_LCD_code`
-`ZLIB_RP2XX=/path/to/zlib-rp2xx`
+`PICO_SDK_PATH=/path/to/pico-sdk
+ PICO_LCD_PATH=/path/to/Pico_LCD_code
+ ZLIB_RP2XX=/path/to/zlib-rp2xx`
 
 ---
 
