@@ -1,7 +1,7 @@
 
-![picovideo](logo-160.png)
+![picovideo](logo-320-red.png)
 
-# picovideo
+## picovideo
 
 
 Drive short looping gif-like videos with the Pico microcontroller on small LCD displays. Working on Nokia-like 1.8" LCD screens.<br>
