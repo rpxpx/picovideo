@@ -1,5 +1,5 @@
 
-![picovideo](logo-320-red.png)
+![picovideo](picologo-320-red.png)
 
 ## picovideo
 
