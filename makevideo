@@ -6,10 +6,10 @@
 
 
 # Check for necessary defd path variables.
-if [[ -e env_vars ]]; then
-    export $(grep PICO_SDK_PATH env_vars)
-    export $(grep PICO_LCD_PATH env_vars)
-    export $(grep ZLIB_RP2XX_PATH env_vars)
+if [[ -e ENV_VARS ]]; then
+    export $(grep PICO_SDK_PATH ENV_VARS)
+    export $(grep PICO_LCD_PATH ENV_VARS)
+    export $(grep ZLIB_RP2XX_PATH ENV_VARS)
     ENV_VARS_EDIT=0
 fi
 
@@ -43,9 +43,9 @@ echo $ZLIB_RP2XX_PATH
 
 # Write results to set_vars
 if [[ $ENV_VARS_EDIT == 1 ]]; then    
-    echo "PICO_SDK_PATH=$PICO_SDK_PATH" > env_vars
-    echo "PICO_LCD_PATH=$PICO_LCD_PATH" >> env_vars
-    echo "ZLIB_RP2XX_PATH=$ZLIB_RP2XX_PATH" >> env_vars
+    echo "PICO_SDK_PATH=$PICO_SDK_PATH" >ENV_VARS
+    echo "PICO_LCD_PATH=$PICO_LCD_PATH" >>ENV_VARS
+    echo "ZLIB_RP2XX_PATH=$ZLIB_RP2XX_PATH" >>ENV_VARS
 fi
 
 
@@ -99,10 +99,10 @@ echo
 
 echo "* Compiling images into ImageDataRaw.c and ImageDataRaw.h byte array files..."
 if [[ "" == "${@:$imgparam}" ]]; then
-    if [[ ! -d ../imgs/ || -z $(ls -A ../imgs/) ]]; then
-	python3 bytearray.py ./imgs/*
+    if [[ -d $(cat IMGS_DIR) && ! -z $(ls -A $(cat IMGS_DIR)) ]]; then	
+	python3 bytearray.py $(cat IMGS_DIR)*
     else
-	python3 bytearray.py ../imgs/*
+	python3 bytearray.py ./imgs/*
     fi
 else
     python3 bytearray.py ${@:imgparam}

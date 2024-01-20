@@ -4,4 +4,6 @@ rm ./screens/ImageData*.[ch]
 rm Framerate.h
 rm video.uf2
 rm pico_sdk_import.cmake
-cp env_vars.empty env_vars
+echo PICO_SDK_PATH= >ENV_VARS
+echo PICO_LCD_PATH= >>ENV_VARS
+echo ZLIB_RP2XX_PATH= >>ENV_VARS

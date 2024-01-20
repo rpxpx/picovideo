@@ -1,11 +1,21 @@
 
-![picovideo](picologo-320-red.png)
+![picovideo](logo.png)
 
 ## picovideo
 
 
-Drive short looping gif-like videos with the Pico microcontroller on small LCD displays. Working on Nokia-like 1.8" LCD screens.<br>
-Supply video frames as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash. Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
+Drive short looping gif-like videos with the Pico microcontroller on small LCD displays.<br>
+Working on Nokia-like 1.8" (160x130 px) LCD screens.
+
+Supply video frames at command-line as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash. Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
+
+Frame images should be prepared standardized to a screen size and for a desired framerate.<br>
+Sample images are provided in the ./imgs directory.
+
+
+![img1](imgs/eyes_160x130.png) ![img2](imgs/horse_160x130.png) ![img3](imgs/bruegel_160x130.png)
+
+Framerates up to 16.36 fps are possible.
 
 
 ## Installation
@@ -14,44 +24,49 @@ Supply video frames as a set of .png images. Compiles frames into a binary that 
 
 - Libraries for python3: numpy matplotlib
 
-- Install Pico SDK:
-Library folder should be named pico-sdk, not e.g. pico-sdk-master
+- Install Pico SDK. Library folder should be named pico-sdk, not e.g. pico-sdk-master<br>
 [https://github.com/raspberrypi/pico-sdk](https://github.com/raspberrypi/pico-sdk)
 
-- Install Wavepath Pico LCD libraries:
-Library folder should be named Pico_LCD_code
-[https://files.waveshare.com/upload/2/28/Pico_code.7z](https://files.waveshare.com/upload/2/28/Pico_code.7z)
+- Install Wavepath Pico LCD libraries. Library folder should be named Pico_LCD_code<br>
+[https://files.waveshare.com/upload/2/28/Pico_code.7z](https://files.waveshare.com/upload/2/28/Pico_code.7z)<br>
 For technical info, see: [https://www.waveshare.com/wiki/Pico-LCD-1.8](https://www.waveshare.com/wiki/Pico-LCD-1.8)
 
-- Install zlib for rp2xx:
-Library folder should be named zlib-rp2xx
+- Install zlib for rp2xx. Library folder should be named zlib-rp2xx<br>
 [https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
 
-- Define directory constants for those libraries in env_vars:
-
-  PICO_SDK_PATH=/path/to/pico-sdk<br>
-  PICO_LCD_PATH=/path/to/Pico_LCD_code<br>
-  ZLIB_RP2XX=/path/to/zlib-rp2xx
+- Define directory constants for the above libraries in ENV_VARS:<br>
+  `PICO_SDK_PATH=/path/to/pico-sdk`<br>
+  `PICO_LCD_PATH=/path/to/Pico_LCD_code`<br>
+  `ZLIB_RP2XX=/path/to/zlib-rp2xx`
 
 ---
 
 ## Usage
 
-   $ ./makevideo <framerate> <compression mode> [<overclock mode>] [<images>]
+   `$ ./makevideo <framerate> <compression mode> [<overclock mode>] [<images>]`
 
 Output appears in picovdeo as video.uf2. Copy this to Pico flash.
 
 Compression modes:<br>
 0: Raw data. Largest binary size, highest framerate.<br>
 1: Single frame compression.<br>
-2: Blokweave compression. Highest possible compression. Smallest binary, lowest framerate.<p>
+2: Blokweave compression. Highest possible compression. Smallest binary, lowest framerate.
 
 Overclock modes:<br>
-0: Standard processor speed: 133 MHz.<br>
-1: Overclock processor: 225 MHz.
+0: Standard processor speed: 133 MHz [default]<br>
+1: Overclock processor: 225 MHz
 
+If no images are supplied as arguments, the images in the folder specified in IMGS_DIR will be used. If that folder is empty, or does not exist, the images in ./imgs will be used.
+ 
 ---
+Maximum binary size is ~4.2MB, limited by available flash memory. Video compilation will fail if binary size would exceed this. Try higher compression, and then a smaller image set.<br>
+In compression mode 0, 49 160x130 px frames can be compiled into video.
 
-Maximum binary size is ~4.2MB. Video compilation will fail if binary size would exceed this.<br>
-In mode 0, with no compression, 49 160x130 pixel frames can be compiled into video.<br>
 Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on.<br>
+When started, Pico will make a first pass through the image set to determine the maximum framerate for the binary. That framerate, and information on image decompression and render times, will be printed to screen for a few seconds. Pico will then loop through the frames at the requested rate, or the highest achievable rate less than that.<br>
+
+Using single frame compression lowers the achievable framerate by ~20%.<br>
+Using block compression lowers the achievable rate by ~50%.<br>
+If the achievable rate is too low, try switching on processor overclocking. Overclocking consumes more power, and will deplete batteries faster.<br>
+Overclocking increases achievable framerate of a binary using single frame compression by ~16%.
+It increases achievable framerate of a binary using block compression by ~35%.
