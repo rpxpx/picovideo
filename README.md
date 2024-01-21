@@ -65,11 +65,11 @@ Highest possible framerate is 16.36 fps, in compression mode 0, and with overclo
 
 If the achievable rate is too low, try switching on processor overclocking. Overclocking consumes more power, and will deplete batteries faster.
 
-*Approx achievable framerates:*
+**Approx achievable framerates**
 
-|        |0:133 MHz|1:225 MHz|
-|--------|---------|---------|
-|0:Raw   |15.30    |16.36    |
-|1:SngleF|~12-13   |~13-14   |
-|2:BlokWv|~7-8     |~9-11    |
+|          |0: 133 MHz|1: 225 MHz|
+|----------|----------|----------|
+|0: Raw    |15.30     |16.36     |
+|1: SngleFr|~12-13    |~13-14    |
+|2: BlokWv |~7-8      |~9-11     |
 
