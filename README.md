@@ -4,7 +4,7 @@
 ## picovideo
 
 
-Drive short looping gif-like videos with the Pico microcontroller on small LCD displays.<br>
+Drive short looping gif-like videos with the Raspberry Pi Pico (RP2040) microcontroller on small LCD displays.<br>
 Working on Nokia-like 1.8" (160x130 px) LCD screens.
 
 Supply video frames at command-line as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash. Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
@@ -20,7 +20,7 @@ Framerates up to 16.36 fps are possible.
 
 ## Installation
 
-- Dependencies: python3 gcc make cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+- Dependencies: bash python3 gcc make cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
 
 - Libraries for python3: numpy matplotlib
 
@@ -61,7 +61,7 @@ If no images are supplied as arguments, the images in the folder specified in IM
 ---
 Maximum binary size is ~4.2MB, limited by available flash memory. Video compilation will fail if binary size would exceed this. Try higher compression, and then a smaller image set. In compression mode 0, 49 160x130 px frames can be compiled into video.
 
-Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on. When started, Pico will make a first pass through the image set to determine the maximum framerate for the binary. That framerate, and information on image decompression and render times, will be printed to screen for a few seconds. Pico will then loop through the frames at the requested rate, or the highest achievable rate, whichever is smallest.
+Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on. When started, Pico will make a first pass through the image set to determine the maximum framerate for the binary. That framerate, and image decompression and render times, will be printed to screen for a few seconds. Pico will then loop through the frames at the requested rate, or the highest achievable rate if lower.
 
 If the achievable rate is too low, try switching on processor overclocking. Overclocking consumes more power, and will deplete batteries faster.
 
