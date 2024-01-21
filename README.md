@@ -59,14 +59,17 @@ Overclock modes:<br>
 If no images are supplied as arguments, the images in the folder specified in IMGS_DIR will be used. If that folder is empty, or does not exist, the images in ./imgs will be used.
  
 ---
-Maximum binary size is ~4.2MB, limited by available flash memory. Video compilation will fail if binary size would exceed this. Try higher compression, and then a smaller image set.<br>
-In compression mode 0, 49 160x130 px frames can be compiled into video.
+Maximum binary size is ~4.2MB, limited by available flash memory. Video compilation will fail if binary size would exceed this. Try higher compression, and then a smaller image set. In compression mode 0, 49 160x130 px frames can be compiled into video.
 
-Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on.<br>
-When started, Pico will make a first pass through the image set to determine the maximum framerate for the binary. That framerate, and information on image decompression and render times, will be printed to screen for a few seconds. Pico will then loop through the frames at the requested rate, or the highest achievable rate less than that.<br>
+Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on. When started, Pico will make a first pass through the image set to determine the maximum framerate for the binary. That framerate, and information on image decompression and render times, will be printed to screen for a few seconds. Pico will then loop through the frames at the requested rate, or the highest achievable rate, whichever is smallest.
 
-Using single frame compression lowers the achievable framerate by ~20%.<br>
-Using block compression lowers the achievable rate by ~50%.<br>
-If the achievable rate is too low, try switching on processor overclocking. Overclocking consumes more power, and will deplete batteries faster.<br>
-Overclocking increases achievable framerate of a binary using single frame compression by ~16%.
-It increases achievable framerate of a binary using block compression by ~35%.
+If the achievable rate is too low, try switching on processor overclocking. Overclocking consumes more power, and will deplete batteries faster.
+
+*Approx achievable framerates:*
+
+|        |0:133 MHz|1:225 MHz|
+|--------|---------|---------|
+|0:Raw   |15.30    |16.36    |
+|1:SngleF|~12-13   |~13-14   |
+|2:BlokWv|~7-8     |~9-11    |
+
