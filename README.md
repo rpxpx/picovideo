@@ -37,7 +37,7 @@ For technical info, see: [https://www.waveshare.com/wiki/Pico-LCD-1.8](https://w
 - Define directory constants for the above libraries in ENV_VARS:<br>
   `PICO_SDK_PATH=/path/to/pico-sdk`<br>
   `PICO_LCD_PATH=/path/to/Pico_LCD_code`<br>
-  `ZLIB_RP2XX=/path/to/zlib-rp2xx`
+  `ZLIB_RP2XX_PATH=/path/to/zlib-rp2xx`
 
 ---
 
@@ -65,11 +65,10 @@ Highest possible framerate is 16.36 fps, in compression mode 0, and with overclo
 
 If the achievable rate is too low, try switching on processor overclocking. Overclocking consumes more power, and will deplete batteries faster.
 
-**Approx achievable framerates**
+**Maximum framerates (fps)**
 
 |          |0: 133 MHz|1: 225 MHz|
 |----------|----------|----------|
 |0: Raw    |15.30     |16.36     |
 |1: SngleFr|~12-13    |~13-14    |
 |2: BlokWv |~7-8      |~9-11     |
-
