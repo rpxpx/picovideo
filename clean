@@ -1,9 +1,9 @@
 #!/bin/bash 
 rm -rf ./build
 rm ./screens/ImageData*.[ch]
-rm Framerate.h
-rm video.uf2
-rm pico_sdk_import.cmake
+[[ -f Framerate.h ]] && rm Framerate.h
+[[ -f video.uf2 ]] && rm video.uf2
+[[ -f pico_sdk_import.cmake ]] && rm pico_sdk_import.cmake
 echo PICO_SDK_PATH= >ENV_VARS
 echo PICO_LCD_PATH= >>ENV_VARS
 echo ZLIB_RP2XX_PATH= >>ENV_VARS

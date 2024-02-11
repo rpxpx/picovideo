@@ -7,7 +7,9 @@
 Drive short looping gif-like videos with the Raspberry Pi Pico (RP2040) microcontroller on small LCD displays.<br>
 Working on Nokia-like 1.8" (160x130 px) LCD screens.
 
-Supply video frames at command-line as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash. Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
+Supply video frames at command-line as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash.
+
+Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
 
 Frame images should be prepared standardized to a screen size and for a desired framerate.<br>
 Sample images are provided in the ./imgs directory.
@@ -16,6 +18,8 @@ Sample images are provided in the ./imgs directory.
 ![img1](imgs/eyes_160x130.png) ![img2](imgs/horse_160x130.png) ![img3](imgs/bruegel_160x130.png)
 
 Framerates up to 16.36 fps are possible.
+
+Developed in collaboration with [Footnote Centre for Image and Text](http://footnotecentre.org/wp/), Belgrade
 
 
 ## Installation
@@ -65,7 +69,7 @@ Highest possible framerate is 16.36 fps, in compression mode 0, and with overclo
 
 If the achievable rate is too low, try switching on processor overclocking. Overclocking consumes more power, and will deplete batteries faster.
 
-**Maximum framerates (fps)**
+**Max framerates (fps)**
 
 |          |0: 133 MHz|1: 225 MHz|
 |----------|----------|----------|

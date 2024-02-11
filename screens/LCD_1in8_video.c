@@ -43,8 +43,6 @@
 //  }\
 //}
 
-
-
 int LCD_1in8_video(void){
 
   if(DEV_Module_Init()!=0){
@@ -86,12 +84,14 @@ int LCD_1in8_video(void){
   LCD_1IN8_Display(BlackImage);
 
   //char logotext[] = "rpx@clearlight.systems";
-  char logotext[] = "JASNASVETLOST SISTEMI";
+  //char logotext[] = "JASNASVETLOST SISTEMI";
+  char logotext[] = "clearlight.systems";
   int tab = ((LCD_1IN8.WIDTH+1) - strlen(logotext)*Font12_WIDTH)/2; 
   Paint_DrawString_EN(tab, LCD_1IN8.HEIGHT-Font12_HEIGHT, logotext, &Font12, BLACK, RED);
   LCD_1IN8_Display(BlackImage);
-  DEV_Delay_ms(2300);
 
+  // 23 deciseconds' delay
+  DEV_Delay_ms(2300);
 
   // Raw data framesize from constants in data .h
   uLong frame_size = FRAME_WIDTH * FRAME_HEIGHT * FRAME_BITDEPTH/8;
