@@ -7,8 +7,7 @@
 Drive short looping gif-like videos with the Raspberry Pi Pico (RP2040) microcontroller on small LCD displays.<br>
 Working on Nokia-like 1.8" (160x130 px) LCD screens.
 
-Supply video frames at command-line as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash.
-
+Supply video frames at command-line as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash.<br>
 Contains a compression algorithm that finds the optimum weave of images into blocks for compression with zlib.
 
 Frame images should be prepared standardized to a screen size and for a desired framerate.<br>
