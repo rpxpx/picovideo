@@ -28,8 +28,8 @@ Developed in collaboration with [Footnote Centre for Image and Text](http://foot
 
 - Libraries for python3: numpy matplotlib
 
-- Install libprimed C library.<br>
-[https://github.com/rpxpx/libprimed](https://github.com/rpxpx/libprimed)
+- Install primed C library.<br>
+[https://github.com/rpxpx/primed](https://github.com/rpxpx/primed)
 
 - Install zlib for rp2xx. Library folder should be named zlib-rp2xx<br>
 [https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
