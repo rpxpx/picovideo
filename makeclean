@@ -1,0 +1,12 @@
+#!/bin/bash 
+
+rm -rf ./build
+rm -f ./screens/ImageData*.[ch]
+[[ -f Framerate.h ]] && rm Framerate.h
+[[ -f video.uf2 ]] && rm video.uf2
+[[ -f pico_sdk_import.cmake ]] && rm pico_sdk_import.cmake
+
+echo LIBPRIMED_PATH= >LIB_PATHS
+echo PICO_SDK_PATH= >>LIB_PATHS
+echo PICO_LCD_PATH= >>LIB_PATHS
+echo ZLIB_RP2XX_PATH= >>LIB_PATHS

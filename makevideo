@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # makevideo.sh FRAMERATE [COMPRESSION:0,1,2] [OVERCLOCK:0,1] IMAGES...
@@ -5,48 +6,14 @@
 # Available clockspeeds: check src/rp2_common/hardware_clocks/scripts/vcocalc.py  
 
 
-# Check for necessary defd path variables.
-if [[ -e ENV_VARS ]]; then
-    export $(grep PICO_SDK_PATH ENV_VARS)
-    export $(grep PICO_LCD_PATH ENV_VARS)
-    export $(grep ZLIB_RP2XX_PATH ENV_VARS)
-    ENV_VARS_EDIT=0
-fi
+bash ./lib_pathfinder.sh
+export $(grep LIBPRIMED_PATH LIB_PATHS)
+export $(grep PICO_SDK_PATH LIB_PATHS)
+export $(grep PICO_LCD_PATH LIB_PATHS)
+export $(grep ZLIB_RP2XX_PATH LIB_PATHS)
 
-# If undefined or not a DIR, try to find with find() in $HOME
-if [[ -z ${PICO_SDK_PATH+x} || ! -d $PICO_SDK_PATH ]]; then
-    ENV_VARS_EDIT=1
-    echo "PICO_SDK_PATH undefined, attempting to find in $HOME..."    
-    export PICO_SDK_PATH=$(./shortest $(find ~ -type d -name pico-sdk 2>/dev/null))      
-fi
-if [[ -z ${PICO_LCD_PATH+x} || ! -d $PICO_LCD_PATH ]]; then
-    ENV_VARS_EDIT=1
-    echo "PICO_LCD_PATH undefined, attempting to find in $HOME..."
-    export PICO_LCD_PATH=$(./shortest $(find ~ -type d -name Pico_LCD_code 2>/dev/null))
-fi 
-if [[ -z ${ZLIB_RP2XX_PATH+x} || ! -d $ZLIB_RP2XX_PATH ]]; then
-    ENV_VARS_EDIT=1
-    echo "ZLIB_RP2XX_PATH undefined, attempting to find in $HOME..."
-    export ZLIB_RP2XX_PATH=$(./shortest $(find ~ -type d -name zlib-rp2xx 2>/dev/null))
-fi 
-
-if [[ ! -d $PICO_SDK_PATH || ! -d $PICO_LCD_PATH || ! -d $ZLIB_RP2XX_PATH ]]; then
-    echo "error: Library paths undefined"
-    exit 1
-fi
-
-echo $PICO_SDK_PATH
 echo "* Attempting to copy pico_sdk_import.cmake"
 cp $PICO_SDK_PATH/external/pico_sdk_import.cmake ./
-echo $PICO_LCD_PATH
-echo $ZLIB_RP2XX_PATH
-
-# Write results to set_vars
-if [[ $ENV_VARS_EDIT == 1 ]]; then    
-    echo "PICO_SDK_PATH=$PICO_SDK_PATH" >ENV_VARS
-    echo "PICO_LCD_PATH=$PICO_LCD_PATH" >>ENV_VARS
-    echo "ZLIB_RP2XX_PATH=$ZLIB_RP2XX_PATH" >>ENV_VARS
-fi
 
 
 # Framerate
@@ -96,11 +63,10 @@ echo
 
 
 # Selecting image set
-
 echo "* Compiling images into ImageDataRaw.c and ImageDataRaw.h byte array files..."
 if [[ "" == "${@:$imgparam}" ]]; then
-    if [[ -d $(cat IMGS_DIR) && ! -z $(ls -A $(cat IMGS_DIR)) ]]; then	
-	python3 bytearray.py $(cat IMGS_DIR)*
+    if [[ -d $(cat IMGS_PATH) && ! -z $(ls -A $(cat IMGS_PATH)) ]]; then	
+	python3 bytearray.py $(cat IMGS_PATH)*
     else
 	python3 bytearray.py ./imgs/*
     fi
@@ -109,23 +75,32 @@ else
 fi
 
 
+
+CFLAGS="-std=c89 -Wall -g -O0"
+
 # Choose compression method.
 if [ $2 == "2" ]; then
-  echo "* Blokweave compression. Compiling compress-blokweave.c with ImageDataRaw.h and outputting compressed ImageDataBlokZ.h..."
-  gcc compress-blokweav.c ImageDataRaw.c weave.c primed.c -lm -lz && ./a.out && rm a.out
-  touch ImageDataZ.h
-  
+  echo "* Blokweave compression."
+  echo "* Compiling compress-blokweave.c with ImageDataRaw.h and outputting compressed ImageDataBlokZ.h..."
+  gcc $CFLAGS -I$LIBPRIMED_PATH compress-blokweav.c ImageDataRaw.c weave.c -L$LIBPRIMED_PATH -lprimed -lm -lz
+  ./a.out
+  rm a.out
+
 elif [ $2 == "1" ]; then
-  echo "* Single frame compression. Compiling compress-simpl.c with ImageDataRaw.h and outputting compressed ImageDataZ.h..."
-  gcc compress-singlefr.c ImageDataRaw.c -lz && ./a.out && rm a.out
-  touch ImageDataBlokZ.h
-else
-  touch ImageDataBlokZ.h 
-  touch ImageDataZ.h 
+  echo "* Single frame compression."
+  echo "* Compiling compress-simpl.c with ImageDataRaw.h and outputting compressed ImageDataZ.h..."
+  gcc $CFLAGS compress-singlefr.c ImageDataRaw.c -lz
+  ./a.out
+  rm a.out
 fi
+
+# Ensure both headers exit, if only as empty files.
+touch ImageDataZ.h
+touch ImageDataBlokZ.h 
 
 echo "* Moving ImageData files to ./screens for compilation."
 mv ImageData*.[ch] ./screens
+
 
 
 echo "* Entering ./build and compiling..."
@@ -141,3 +116,5 @@ else
     echo "error: Failed to compile video."    
 fi
 cd ..
+
+

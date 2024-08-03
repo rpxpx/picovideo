@@ -15,7 +15,7 @@ project(ram_find VERSION 1.0)
 pico_sdk_init()
 
 # Include root directory to make data and framerate files available
-include_directories(./)
+# include_directories(./)
 
 set(PICO_LCD_CODE $ENV{PICO_LCD_PATH}/c)
 

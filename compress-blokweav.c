@@ -1,27 +1,24 @@
-/* 
- * Read in raw byte array for pico LCD images. Compress with zlib. 
+
+/* Read in raw byte array for Pico LCD images. Compress with zlib. 
  * Weave images into bloks, compress the bloks. 
  * Use brute-force optimization to determine best grain size for weaving bloks.
- *
  */
 
+#include <stdio.h>  /* printf() output during compression. */
+#include <stdlib.h> /* malloc(), free() */
+#include <zlib.h>   /* compress(); sytem zlib, not local rp2xx */
 
-#include <stdio.h>  // printf() output during compression.
-#include <stdlib.h> // malloc(), free().
-#include "zlib.h"   // compress()
+#include "primed.h" /* struct inta, divizors(). Gives all possible grain sizes for weave tests. */
 
-#include "primed.h" // struct inta, divizors(). Gives all possible grain sizes for weave tests.
-#include "weave.h"  // weave(). 
-
-#include "Pico_spec.h" // Total and available free SRAM. Free available SRAM found by compiling and running ram_find.c 
-
-#include "ImageDataRaw.h" // Data as #include in compilation. Raw byte array set of images.
+#include "weave.h"  /* weave() */
+#include "Pico_spec.h" /* Total and available free SRAM. Free available SRAM found by compiling and running ram_find.c */
+#include "ImageDataRaw.h" /* Data as #include in compilation. Raw byte array set of images. */
 
 
 #define OUTHEDR "ImageDataBlokZ.h"
 #define OUTDATA "ImageDataBlokZ.c"
 #define OUTHEDRPRE "_IMAGEDATABLOKZ_H_"
-#define PRINTWIDTH 16 // 16 bytes per line.
+#define PRINTWIDTH 16 /* 16 bytes per line. */
 
 
 #define CHECK_ERR(err, msg){\
@@ -32,18 +29,17 @@
 }
 
 
-
 int main(){
 
   uint frame_size, frames_len, bloks, num_max;
-  frame_size = sizeof(frames[0]); // period in weave.
-  frames_len = sizeof(frames)/frame_size; // Total number of frames. Length of frames[] array. 
-  num_max = FREE_SRAM/frame_size; // Max frames in a blok. Leave room in RAM to unweave 1 frame to. FREE_SRAM defined in Pico_spec.h
-  bloks = ceil(frames_len/(num_max*1.0)); // Number of bloks needed for all frames.
+  frame_size = sizeof(frames[0]); /* period in weave. */
+  frames_len = sizeof(frames)/frame_size; /* Total number of frames. Length of frames[] array. */
+  num_max = FREE_SRAM/frame_size; /* Max frames in a blok. Leave room in RAM to unweave 1 frame to. FREE_SRAM defined in Pico_spec.h */
+  bloks = ceil(frames_len/(num_max*1.0)); /* Number of bloks needed for all frames. */
   
-  struct inta divs = divizors(frame_size);
+  inta divs = divizors(frame_size);
   sort_inta(divs);
-
+  
   printf("Assuming free SRAM: %d\n", FREE_SRAM);
   printf("max frames in each blok: %d\n", num_max);
   printf("frame size (B): %d; frame count: %d\n", frame_size, frames_len);
@@ -59,23 +55,24 @@ int main(){
 
   zLen_total = 0;
  
-  // *** DATA FILE ***
-  // Prep data file. (Data written out to OUTHEDR,OUTDATA)
-  FILE *fp; // file pointer
+  /* *** DATA FILE *** */
+  /* Prep data file. (Data written out to OUTHEDR,OUTDATA) */
+  FILE *fp; 
   fp = fopen(OUTDATA, "w");
   fprintf(fp, "#include \"%s\"\n", OUTHEDR);
   fprintf(fp, "const unsigned char bloksZ[] = {\n");
 
-  
-  for (uint blok_i=0; blok_i<bloks; blok_i++){
-    // Frames in this blok.
+  uint i,blok_i;
+  for (blok_i=0; blok_i<bloks; blok_i++){
+    /* Frames in this blok.*/
     num = min(num_max,(frames_len-blok_i*num_max)); 
     printf("Blok %d. Frames in blok: %d\n",blok_i,num);
-    printf("Frames [%d..%d]\n",blok_i*num_max,blok_i*num_max+num-1); // Integer interval.
-     
-    // Find best grain for weave.
-    // Brute force optimization: Cycle through all divisors of period.
-
+    printf("Frames [%d..%d]\n",blok_i*num_max,blok_i*num_max+num-1); /* Integer interval. */
+    
+    
+    /* Find best grain for weave. */
+    /* Brute force optimization: Cycle through all divisors of period. */
+    
     if (num==1){
       zLen = frame_size*num; 
       compress(blokweaveZ, &zLen, (Byte *)frames[blok_i*num_max], frame_size);
@@ -83,10 +80,10 @@ int main(){
       grain_best = frame_size;
       zLen_best = zLen;
     }else{
-      for (uint i=0;i<divs.l;i++){
+      for (i=0; i<divs.l; i++){
         grain = *(divs.a+i);
         weave(blokweave, (Byte *)frames[blok_i*num_max], grain, frame_size, num);
-        // Compress the weave
+        /* Compress the weave */
         zLen = frame_size*num; 
         compress(blokweaveZ, &zLen, (Bytef*)blokweave, frame_size*num);
         if (i==0 || zLen<zLen_best){
@@ -95,51 +92,50 @@ int main(){
         }
       }
     }
-    printf("Optimum grain: %d : compresses to: %ld B\n",grain_best, zLen_best);
+    printf("Optimum grain: %d : compresses to: %ld B\n", grain_best, zLen_best);
     
-    // Record blok results.
+    /* Record blok results. */
     bloksZlen[blok_i] = zLen_best;
     blokweave_grain[blok_i] = grain_best;
     zLen_total += zLen_best;
 
-    // Reweave on best grain and recompress.
+    /* Reweave on best grain and recompress. */
     weave(blokweave, (Byte *)frames[blok_i*num_max], grain_best, frame_size, num);
     zLen = frame_size*num; 
     compress(blokweaveZ, &zLen, (Bytef*)blokweave, frame_size*num);
-
-    // Write out data immediately to file. dataZ length array written out afterwards.
-    // Cycle through compressed data array.
-    for (uint i=0; i<zLen; i++){
+    
+    /* Write out data immediately to file. dataZ length array written out afterwards. */
+    /* Cycle through compressed data array. */
+    for (i=0; i<zLen; i++){
       fprintf(fp, "%#04X,",*(blokweaveZ+i));
       if ((i+1)%PRINTWIDTH==0 || (i+1)==zLen)
         fprintf(fp, "\n");
     } 
-    fprintf(fp,"\n"); // Mark boundary between bloks in ascii files.
+    fprintf(fp,"\n"); /* Mark boundary between bloks in ascii files. */
   }
   fprintf(fp,"};\n");
-
-  // Free memory;
+  
+  /* Free memory */
   free(blokweave); 
   free(blokweaveZ);
-
-  // Write to file data lengths and weave grains of compressed bloks. 
-  // Data lengths.
+  
+  /* Write to file data lengths and weave grains of compressed bloks. */
+  /* Data lengths. */
   fprintf(fp, "const unsigned long bloksZlen[%d] = {\n", bloks);   
-  uint i;
-  for (i = 0; i<bloks; i++)    
+  for (i=0; i<bloks; i++)    
     fprintf(fp, "%ld,\n", bloksZlen[i]);
   fprintf(fp, "};\n");
   
-  // Weave grains.
+  /* Weave grains. */
   fprintf(fp, "const unsigned int blokweave_grain[%d] = {\n", bloks);   
-  for (i = 0; i<bloks; i++)    
+  for (i=0; i<bloks; i++)    
     fprintf(fp, "%d,\n", blokweave_grain[i]);
   fprintf(fp, "};\n");
   fclose(fp);
-
   
-  // *** HEADER FILE ***
-  //
+  
+  /* *** HEADER FILE *** */
+  
   fp = fopen(OUTHEDR, "w");
   fprintf(fp, "#ifndef %s\n", OUTHEDRPRE);
   fprintf(fp, "#define %s\n\n", OUTHEDRPRE);

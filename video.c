@@ -1,25 +1,28 @@
 
-#include "LCD_ALL_video.h"
+#include "LCD_video_ALL.h"
 
-// For overclok funcs. 
+/* For overclock functions */
 #include "pico/stdlib.h" 
 #include "hardware/vreg.h"
 
 
-//uint valid_clocks[] = {100000,130000,133000,160000,190000,220000,260000,290000,0}; // Zero-terminates array.
+/* Theoretically valid clock speeds: */
+/* 100000,130000,133000,160000,190000,220000,260000,290000 */
+/* In my experiments, 225000 was the highest functioning rate when driving the 1in8 LCD. */
+
 
 int main(void){
 
   if (OVERCLOCK){
     vreg_set_voltage(VREG_VOLTAGE_1_30);
-    set_sys_clock_khz(225000,true);
+    set_sys_clock_khz(225000, true);
   }
 
-  LCD_1in8_video();
+  LCD_video_1in8();
   
-  // Other screen video functions here.
-  // LCD_1in3_video();
-  // etc.
+  /* Other screen video functions here. */
+  /* LCD_video_1in3(); */
+  /* etc. */
   
   return 0;
 }

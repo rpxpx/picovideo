@@ -1,7 +1,7 @@
 
-![picovideo](logo.png)
+![](logo-r-336.png)
 
-## picovideo
+### picovideo
 
 
 Drive short looping gif-like videos with the Raspberry Pi Pico (RP2040) microcontroller on small LCD displays.<br>
@@ -18,14 +18,21 @@ Sample images are provided in the ./imgs directory.
 
 Framerates up to 16.36 fps are possible.
 
-Developed in collaboration with [Footnote Centre for Image and Text](http://footnotecentre.org/wp/), Belgrade
+Developed in collaboration with [Footnote Centre for Image and Text](http://footnotecentre.org/wp/), Belgrade.
 
+---
 
 ## Installation
 
-- Dependencies: bash python3 gcc make cmake gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
+- System dependencies: bash python3 gcc make cmake zlib gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib
 
 - Libraries for python3: numpy matplotlib
+
+- Install libprimed C library.<br>
+[https://github.com/rpxpx/libprimed](https://github.com/rpxpx/libprimed)
+
+- Install zlib for rp2xx. Library folder should be named zlib-rp2xx<br>
+[https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
 
 - Install Pico SDK. Library folder should be named pico-sdk, not e.g. pico-sdk-master<br>
 [https://github.com/raspberrypi/pico-sdk](https://github.com/raspberrypi/pico-sdk)
@@ -34,10 +41,8 @@ Developed in collaboration with [Footnote Centre for Image and Text](http://foot
 [https://files.waveshare.com/upload/2/28/Pico_code.7z](https://files.waveshare.com/upload/2/28/Pico_code.7z)<br>
 For technical info, see: [https://www.waveshare.com/wiki/Pico-LCD-1.8](https://www.waveshare.com/wiki/Pico-LCD-1.8)
 
-- Install zlib for rp2xx. Library folder should be named zlib-rp2xx<br>
-[https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
-
-- Define directory constants for the above libraries in ENV_VARS:<br>
+- Optionally define directory constants for the above libraries in LIB_PATHS:<br>
+  `LIBPRIMED_PATH=/path/to/libprimed`<br>
   `PICO_SDK_PATH=/path/to/pico-sdk`<br>
   `PICO_LCD_PATH=/path/to/Pico_LCD_code`<br>
   `ZLIB_RP2XX_PATH=/path/to/zlib-rp2xx`
@@ -70,8 +75,8 @@ If the achievable rate is too low, try switching on processor overclocking. Over
 
 **Max framerates (fps)**
 
-|          |0: 133 MHz|1: 225 MHz|
-|----------|----------|----------|
-|0: Raw    |15.30     |16.36     |
-|1: SngleFr|~12-13    |~13-14    |
-|2: BlokWv |~7-8      |~9-11     |
+|            |`0: 133 MHz`|`1: 225 MHz`|
+|------------|------------|------------|
+|`0: Raw`    |`15.30`     |`16.36`     |
+|`1: SngleFr`|`12-13`     |`13-14`     |
+|`2: BlokWv` |`7-8`       |`9-11`      |

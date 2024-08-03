@@ -20,9 +20,8 @@ include_directories(./)
 
 include($ENV{ZLIB_RP2XX_PATH}/interfaceLibForPicoSDK.cmake)
 
-set(PICO_LCD_CODE $ENV{PICO_LCD_PATH}/c)
-
 # Include dirs to Pico LCD libraries SOURCE
+set(PICO_LCD_CODE $ENV{PICO_LCD_PATH}/c)
 include_directories(${PICO_LCD_CODE}/lib/Config)
 include_directories(${PICO_LCD_CODE}/lib/GUI)
 include_directories(${PICO_LCD_CODE}/lib/Fonts)

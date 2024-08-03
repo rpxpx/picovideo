@@ -1,11 +1,10 @@
 
-# Pass a set of images, convert to bytearray and store in 2d array.
-# Convert pixel values to target BITDEPTH. (Necessary for LCD screen.) 
-# 
+# Pass a set of images, convert to bytearray and store in 2D array.
+# Convert pixel values to target BITDEPTH. (Necessary for LCD display.)
+# Write output as ascii data to C source files, for use in compilation of compression programs generating Pico binaries.
 
 
 import sys
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 #from icecream import ic
@@ -21,15 +20,21 @@ PRINTWIDTH = 16/2
 def main():
     frames = len(sys.argv)-1
     
-    if frames<1:
-        print("No image argument")
+    if (frames<1):
+        print("err: No image argument")
         return
 
-    # Take dimensions from first image. (Currently no check for consistency.)
+    # Dimensions of first image
     img = plt.imread(sys.argv[1])
-    
     w = img.shape[1]
     h = img.shape[0]
+    
+    # Check that all images have the same size.
+    for i in range(2,frames+1):
+        img = plt.imread(sys.argv[i])
+        if (w != img.shape[1] or h != img.shape[0]):
+            print("err: Supplied images do not all have the same size.")
+            return
     
     imgtitle = "const unsigned char frames"
     
@@ -49,10 +54,10 @@ def main():
         fo.write(imgtitle+"["+str(frames)+"]["+str(2*w*h)+"] = {\n")
         
         print("* Converting {} images to raw byte array ascii data.".format(frames))
-        for f in range(frames):
-            
-            print("{}".format(sys.argv[f+1]))
-            img = plt.imread(sys.argv[f+1])
+        
+        for f in range(1, frames+1):            
+            print("{}".format(sys.argv[f]))
+            img = plt.imread(sys.argv[f])
             
             fo.write("{\n")
             for y in range(h):
@@ -68,7 +73,7 @@ def main():
                     #ic(rgb)
                     
                     # Convert to binary, and then hex
-                    b = '{0:05b}'.format(int(rgb[0]))+'{0:06b}'.format(int(rgb[1]))+'{0:05b}'.format(int(rgb[2]))            
+                    b = '{0:05b}'.format(int(rgb[0]))+'{0:06b}'.format(int(rgb[1]))+'{0:05b}'.format(int(rgb[2]))
                     hexbyt = hex(int(b,2)).upper()
                     # Pad out with zeros if necessary
                     if len(hexbyt)<6:
@@ -78,44 +83,14 @@ def main():
                     fo.write("0X{},0X{},".format(hexbyt[4:],hexbyt[2:4]))
                     if (y*w+x+1)%PRINTWIDTH==0:
                         fo.write("\n")
-            if f<frames-1:
+            if f<frames:
                 fo.write("},")
             else:
                 fo.write("}")
         
         fo.write("};\n")
-        
-    
+            
     print("* Data written to {}.[ch]".format(OUTFILE))
-    # b = []
-    # with open(sys.argv[1], "rb") as imgf:
-    #     img = imgf.read()
-    #     b = bytearray(img)
-        
-    # t = list(b)[:16]
-    # print(t)
-    # for i in range(len(t)):
-    #     print(hex(t[i]))
-    # return
-
-    
-    
-    # img2 = []
-    # with open(sys.argv[1]) as f1:
-    #     img1 = csv.reader(f1)
-    #     for row in img1:            
-    #         for i in row:
-    #             b = i.replace(" ","")
-    #             if b!="":
-    #                 b2 = ["0X"+b[-2:].upper(),"0X"+b[2:4].upper()]
-    #                 img2.extend(b2)
-                    
-    # with open("o.csv","w",newline="") as csvout:        
-    #     csvout.write("const unsigned char gImage_vid_f1[40960] = {\n")        
-    #     for i in range(len(img2)//16):
-    #         csvout.write( ",".join( img2[i*16:(i+1)*16] )+",\n" )
-    #         #imgwrite.writerow(img2[i:i+16])            
-    #     csvout.write("};\n")
     
     return
 main()
