@@ -4,7 +4,7 @@
 ### picovideo
 
 
-Drive short looping gif-like videos with the Raspberry Pi Pico (RP2040) microcontroller on small LCD displays.<br>
+Drive short looping gif-like videos with the Raspberry Pi Pico microcontroller (RP2040) on small LCD displays.<br>
 Working on Nokia-like 1.8" (160x130 px) LCD screens.
 
 Supply video frames at command-line as a set of .png images. Compiles frames into a binary that is dropped onto Pico flash.<br>
