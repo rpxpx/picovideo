@@ -16,7 +16,7 @@
 
 /* LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT */
 /* These symbolic constants are defined in LCD_1in8.h */
-/* WIDTH 130, HEIGHT 160 */
+/* WIDTH 128, HEIGHT 160 */
 /* are swapped during the HORIZONTAL call to LCD_1IN8_Init() */
 
 #define SPLASH_DELAY 100
