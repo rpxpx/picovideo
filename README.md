@@ -66,7 +66,7 @@ Overclock modes:<br>
 If no images are supplied as arguments, the images in the folder specified in IMGS_DIR will be used. If that folder is empty, or does not exist, the images in ./imgs will be used.
  
 ---
-Maximum binary size is ~4.2MB, limited by available flash memory. Video compilation will fail if binary size would exceed this. Try higher compression, and then a smaller image set. In compression mode 0, 49 160x130 px frames can be compiled into video.
+Maximum binary size is ~4.2MB, limited by available flash memory. Video compilation will fail if binary size would exceed this. Try higher compression, and then a smaller image set. In compression mode 0, 50 160x128 px frames can be compiled into video.
 
 Highest possible framerate is 16.36 fps, in compression mode 0, and with overclocking on. When started, Pico will make a first pass through the image set to determine the maximum framerate for the binary. That framerate, and image decompression and render times, will be printed to screen for a few seconds. Pico will then loop through the frames at the requested rate, or the highest achievable rate if lower.
 
@@ -74,8 +74,10 @@ If the achievable rate is too low, try switching on processor overclocking. Over
 
 **Max framerates (fps)**
 
-|            |`0: 133 MHz`|`1: 225 MHz`|
-|------------|------------|------------|
-|`0: Raw`    |`15.30`     |`16.36`     |
-|`1: SngleFr`|`12-13`     |`13-14`     |
-|`2: BlokWv` |`7-8`       |`9-11`      |
+|                 |`0: 133 MHz`|`1: 225 MHz`|
+|-----------------|------------|------------|
+|`0: raw`         |`15.30`     |`16.36`     |
+|`1: single frame`|`12-13`     |`13-14`     |
+|`2: blokweave`   |`7-8`       |`9-11`      |
+
+
