@@ -19,6 +19,8 @@ Framerates up to 16.36 fps are possible.
 
 Developed in collaboration with [Footnote Centre for Image and Text](http://footnotecentre.org/wp/), Belgrade.
 
+Some example videos [here](https://www.youtube.com/@mind_glider/).
+
 ---
 
 ## Installation
