@@ -3,6 +3,7 @@
 
 /* For overclock functions */
 #include "pico/stdlib.h" 
+#include "hardware/clocks.h"
 #include "hardware/vreg.h"
 
 
