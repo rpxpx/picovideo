@@ -19,11 +19,11 @@
 /* WIDTH 128, HEIGHT 160 */
 /* are swapped during the HORIZONTAL call to LCD_1IN8_Init() */
 
-#define SPLASH_DELAY 100
+#define SPLASH_DELAY_MS 100
 #define SPLASH_RAD 55
 #define SPLASH_Y 60
 #define SPLASH_READY 500
-#define DATA_DISP_DELAY 5000
+#define DATA_DISP_DELAY_US 8000000
 
 
 /* bool reserved_addr(uint8_t addr) { */
@@ -67,12 +67,12 @@ int LCD_video_1in8(void){
   Paint_SetRotate(ROTATE_0);
   
   /* Splash screen polygon animation: Clearlight Systems / Jasnasvetlost Sistemi */
-  DEV_Delay_ms(SPLASH_DELAY);
+  sleep_ms(SPLASH_DELAY_MS);
   Paint_DrawRectangle(1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL); /* Paint it black.*/
   LCD_1IN8_Display(BlackImage);
-
-  Paint_InflatePolygon(&LCD_1IN8_Display,BlackImage,6,SPLASH_RAD,80,SPLASH_Y,PI,2*SPLASH_DELAY,WHITE,BLACK,DOT_PIXEL_1X1,DRAW_FILL_EMPTY);
-  Paint_InflatePolygon(&LCD_1IN8_Display,BlackImage,3,SPLASH_RAD,80,SPLASH_Y,PI,2*SPLASH_DELAY,WHITE,BLACK,DOT_PIXEL_1X1,DRAW_FILL_EMPTY);
+  
+  Paint_InflatePolygon(&LCD_1IN8_Display,BlackImage,6,SPLASH_RAD,80,SPLASH_Y,PI,2*SPLASH_DELAY_MS,WHITE,BLACK,DOT_PIXEL_1X1,DRAW_FILL_EMPTY);
+  Paint_InflatePolygon(&LCD_1IN8_Display,BlackImage,3,SPLASH_RAD,80,SPLASH_Y,PI,2*SPLASH_DELAY_MS,WHITE,BLACK,DOT_PIXEL_1X1,DRAW_FILL_EMPTY);
   Paint_DrawPolygon(6,SPLASH_RAD,80,SPLASH_Y,PI,WHITE,DOT_PIXEL_1X1,DRAW_FILL_EMPTY);
   LCD_1IN8_Display(BlackImage);
 
@@ -82,17 +82,18 @@ int LCD_video_1in8(void){
   int tab = ((LCD_1IN8.WIDTH+1) - strlen(logotext)*Font12_WIDTH)/2; 
   Paint_DrawString_EN(tab, LCD_1IN8.HEIGHT-Font12_HEIGHT, logotext, &Font12, BLACK, RED);
   LCD_1IN8_Display(BlackImage);
-
-  DEV_Delay_ms(2300);
-
+  
+  sleep_ms(2300);
   
   /* Raw data framesize from constants in data .h */
   uLong frame_size = FRAME_WIDTH * FRAME_HEIGHT * FRAME_BITDEPTH/8;
 
   /* On first pass through image render loop, calculate mean render and decompression times.*/
-  absolute_time_t start, end;
+  absolute_time_t start, end, end_testrun;
   uint frames_total = 0;
-  float delay_ms = -1;
+  char firstpass = 1;
+  uint64_t delay_us;
+  
   
   /* Some preprocessor directives for conditional compilation.  */
   /* Compile decompression and rendering code according to which data header files are present. */
@@ -122,16 +123,19 @@ int LCD_video_1in8(void){
  
   /* Time decompression and rendering to get true framerate. */
   /* Unit: microseconds (us) */
-  int64_t decompr_us = 0;
-  int64_t imgweav_us = 0;
-
-
+  uint64_t decompr_us = 0;
+  uint64_t imgweav_us = 0;
+  uint64_t u_decompr_us;
+  uint64_t u_imgweav_us;
+  /* total time for testrun and data display: important if attempting to sync start of several picovideos*/
+  uint64_t testrun_us; 
+  
+  
   /* Loop through bloks.*/
   bloks_i = 0;
   for (;;){
-    /* If delay_ms -ve, this is the first pass: */
-    /* we calculate necessary delay from mean decompression and render times. */
-    if (delay_ms<0) 
+    /* we calculate necessary frame delay from mean decompression and render times. */
+    if (firstpass) 
       start = get_absolute_time();
     
     bloklen = frame_size*(NUM_MAX);
@@ -141,33 +145,31 @@ int LCD_video_1in8(void){
     /* Number of frames in this blok. */
     num = bloklen/frame_size; 
     
-    if (delay_ms<0){
+    if (firstpass){
       end = get_absolute_time(); 
       decompr_us += absolute_time_diff_us(start,end);
       frames_total += num;
     }
-
+    
     /* Loop through frames in blok. */
     for (frames_i=0; frames_i<num; frames_i++){
-      if (delay_ms<0)
+      if (firstpass)
         start = get_absolute_time();
       else{
         if (frames_i==0){
-          if (delay_ms>0)
-            DEV_Delay_ms(delay_ms);
+	  sleep_us(delay_us-u_decompr_us);
         }else{
-          DEV_Delay_ms(delay_ms+(decompr_us/1000.0));
+          sleep_us(delay_us);
         }
       }
       
       /* Draw this frame. */      
       /* Each frame is picked out of the weave with four parameters: index, grain, period, number. */
       /* grain is the size (b) of each chunk */
-      /* period is the */
       Paint_DrawImageWeave((Byte*)blok, 0, 0, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT, frames_i, blokweave_grain[bloks_i], frame_size, num); 
       LCD_1IN8_Display(BlackImage);
-
-      if (delay_ms<0){
+      
+      if (firstpass){
         end = get_absolute_time();
         imgweav_us += absolute_time_diff_us(start, end);
       }
@@ -177,15 +179,20 @@ int LCD_video_1in8(void){
     if (bloks_i==bloks-1){ 
       bloksZp = bloksZ;
       bloks_i = 0;
+      
       /* If this was the first pass through the bloks, determine delay. */
-      if (delay_ms<0){
+      if (firstpass){
         /* Convert sums to integer means. */
-        decompr_us = round(decompr_us/(bloks*1.0));
-        imgweav_us = round(imgweav_us/(frames_total*1.0));
-	/* Convert delay times from us to ms. FRAMERATE is specified in fps. */
-        delay_ms = 1000.0/FRAMERATE - decompr_us/1000.0 - imgweav_us/1000.0; 
-        if (delay_ms<0)
-	  delay_ms = 0;
+        u_decompr_us = round(decompr_us/(bloks*1.0));
+        u_imgweav_us = round(imgweav_us/(frames_total*1.0));
+	
+	uint64_t requested = 1000000.0/FRAMERATE;
+	/* mean render of first frame in blok: requires blok depcompression then imgweav */
+	uint64_t render_us = u_decompr_us + u_imgweav_us;
+	if (render_us > requested)
+	  delay_us = 0;
+	else
+	  delay_us = requested - render_us;
 	
         /* Paint_DrawRectangle(1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);*/
         /* LCD_1IN8_Display(BlackImage);*/
@@ -194,17 +201,19 @@ int LCD_video_1in8(void){
 	uint i;
         for (i=0; i<5; i++)
           outs[i] = (char *)malloc(23);
-        sprintf(outs[0],"decompr t:%ld mcs",decompr_us); 
-        sprintf(outs[1],"wvrendr t:%ld mcs",imgweav_us); 
-        sprintf(outs[2],"MAX F.RATE: %.2f fps",pow(10,6)/(decompr_us+imgweav_us)); 
-        sprintf(outs[3],"selected: %d", FRAMERATE);
-        sprintf(outs[4],"fr delay: %.3f ms",delay_ms); 
+        sprintf(outs[0],"u decompr us: %ld",u_decompr_us); 
+        sprintf(outs[1],"u wvrendr us: %ld",u_imgweav_us); 
+        sprintf(outs[2],"MAX F.RATE: %.6f",pow(10.0,6)/(render_us)); 
+        sprintf(outs[3]," requested: %.6f", FRAMERATE);
+        sprintf(outs[4],"  f delay us: %ld", delay_us);
         for (i=0; i<5; i++){
           Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
           free(outs[i]);
         }
         LCD_1IN8_Display(BlackImage);
-        DEV_Delay_ms(DATA_DISP_DELAY);
+	firstpass = 0;
+	//end_testrun = get_absolute_time();
+        sleep_us(DATA_DISP_DELAY_US - absolute_time_diff_us(start, end_testrun));	
       }
     }else{
       bloksZp += bloksZlen[bloks_i]; 
@@ -213,13 +222,12 @@ int LCD_video_1in8(void){
   }
   
   
-  
-  /* *** 2. SINGL *** single frame compression. */
-  #elif defined _IMAGEDATAZ_H_
+  /* *** 2. SINGL *** single frame compression */
+#elif defined _IMAGEDATAZ_H_
   
   /* Create decompress buffer */
   Byte *frame = (Byte *)malloc(frame_size);
-
+  
   frames_total = sizeof(framesZlen)/sizeof(uLong);
   
   /* If there is only one frame: no looping, no delay. */
@@ -230,26 +238,28 @@ int LCD_video_1in8(void){
     LCD_1IN8_Display(BlackImage);
   }else{
     /* Time (microsecs) decompression and rendering to determine max framerate. */
-    int64_t render_us = 0;
+    uint64_t render_us = 0;  /* total for all frames */
+    uint64_t u_render_us;    /* mean */
     
     /* Copy the data pointer */
     const unsigned char *framesZp = framesZ;
     uint frames_i = 0;
     
+    
     for (;;){
-      if (delay_ms<0){
+      /* If first pass, take times to calc necess frame delays. */
+      if (firstpass)
         start = get_absolute_time();
-      }
       
       uncompress(frame, &frame_size, framesZp, framesZlen[frames_i]);
       Paint_DrawImage((char*)frame, 1, 1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT);
       LCD_1IN8_Display(BlackImage);
       
-      if (delay_ms<0){
-        end = get_absolute_time();
-        render_us += absolute_time_diff_us(start,end);  
-      }else if(delay_ms>0){
-        DEV_Delay_ms(delay_ms);
+      if (firstpass){
+	end = get_absolute_time();
+        render_us += absolute_time_diff_us(start, end);
+      }else{
+        sleep_us(delay_us);
       }
       
       if (frames_i<(frames_total-1)){
@@ -257,32 +267,45 @@ int LCD_video_1in8(void){
       }else{
         frames_i = 0; 
         framesZp = framesZ;
-        if (delay_ms<0){
-          render_us = round(render_us/(frames_total*1.0));
-          delay_ms = 1000.0/FRAMERATE - render_us/1000.0;
-          if (delay_ms<0)
-	    delay_ms = 0;
+	
+	/* If first pass */
+	/* Determine mean render time; use this to calc frame render delay  */
+        if (firstpass){
+	  uint64_t requested = round(pow(10.0,6)/FRAMERATE);
+	  u_render_us = round(render_us/(frames_total*1.0));
+	  if (u_render_us > requested)
+	    delay_us = 0;
+	  else
+	    delay_us = requested - u_render_us;
 	  
           char *outs[4];
 	  uint i;
           for (i=0; i<4; i++)
             outs[i] = (char *)malloc(23);
-          sprintf(outs[0],"render t:%ld mcs",render_us); 
-          sprintf(outs[1],"MAX F.RATE: %.2f fps",pow(10,6)/(render_us)); 
-          sprintf(outs[2],"selected: %d",FRAMERATE); 
-          sprintf(outs[3],"fr delay: %0.3f ms",delay_ms); 
+          sprintf(outs[0],"u render us: %ld", u_render_us); 
+          sprintf(outs[1]," MAX F.RATE: %.6f", pow(10.0,6)/(u_render_us));
+          sprintf(outs[2],"  requested: %.6f", FRAMERATE);
+          sprintf(outs[3],"fr delay us: %ld", delay_us);
           for (i=0; i<4; i++){
             Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
             free(outs[i]);
           }
           LCD_1IN8_Display(BlackImage);
-          DEV_Delay_ms(DATA_DISP_DELAY);
-        }
+	  firstpass = 0;
+
+	  /* Taking absolute time again here to set a common start point */
+	  /* across several frames doesn't work. First frames start staggered. */
+	  /* Why...? That should be more accurate. */
+	  //end_testrun = get_absolute_time();
+	  //render_us = absolute_time_diff_us(start, end_testrun);
+	  //render_us = absolute_time_diff_us(start, end_testrun);
+          sleep_us(DATA_DISP_DELAY_US - render_us);
+	}
       }
     }
   }
-
-
+  
+  
   /* *** 3. RAW *** uncompressed frames. */
   #else
   
@@ -298,33 +321,35 @@ int LCD_video_1in8(void){
     start = get_absolute_time();
     Paint_DrawImage(frames[0],1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT);
     LCD_1IN8_Display(BlackImage);
-    end = get_absolute_time();
-    int64_t render_us = absolute_time_diff_us(start, end);
-    delay_ms = 1000.0/FRAMERATE - render_us/1000.0;
-    if (delay_ms<0)
-      delay_ms = 0;
+    uint64_t render_us = absolute_time_diff_us(start, get_absolute_time());
+    
+    uint64_t requested = round(pow(10.0,6)/FRAMERATE);
+
+    if (render_us > requested)
+      delay_us = 0;
+    else
+      delay_us = requested - render_us;
     
     char *outs[4];
     for (i=0; i<4; i++)
       outs[i] = (char *)malloc(23);
-    sprintf(outs[0],"render t:%ld mcs",render_us); 
-    sprintf(outs[1],"MAX F.RATE: %.2f fps",pow(10,6)/(render_us)); 
-    sprintf(outs[2],"selected: %d",FRAMERATE); 
-    sprintf(outs[3],"fr delay: %0.3f ms",delay_ms); 
+    sprintf(outs[0]," render us: %ld", render_us); 
+    sprintf(outs[1],"MAX F.RATE: %.6f", pow(10.0,6)/(render_us)); 
+    sprintf(outs[2]," requested: %.6f", FRAMERATE); 
+    sprintf(outs[3],"f delay us: %ld", delay_us); 
     for (i=0; i<4; i++){
       Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
       free(outs[i]);
     }
     LCD_1IN8_Display(BlackImage);
-    DEV_Delay_ms(DATA_DISP_DELAY);
+    //render_us = absolute_time_diff_us(start, get_absolute_time());
+    sleep_us(DATA_DISP_DELAY_US - render_us);
     
     uint frames_i = 0;
     for (;;){
       Paint_DrawImage(frames[frames_i],1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT);
-      LCD_1IN8_Display(BlackImage);
-      
-      if (delay_ms>0)
-	DEV_Delay_ms(delay_ms);
+      LCD_1IN8_Display(BlackImage);      
+      sleep_us(delay_us);
       frames_i = (frames_i+1)%frames_total;
     }
   }

@@ -35,6 +35,9 @@ Some example videos [here](https://www.youtube.com/@mind_glider/).
 - Install zlib for rp2xx. Library folder should be named zlib-rp2xx<br>
 [https://github.com/kripton/zlib/tree/rp2xx](https://github.com/kripton/zlib/tree/rp2xx)
 
+- Install picotool.
+[https://github.com/raspberrypi/picotool](https://github.com/raspberrypi/picotool)
+
 - Install Pico SDK. Library folder should be named pico-sdk, not e.g. pico-sdk-master<br>
 [https://github.com/raspberrypi/pico-sdk](https://github.com/raspberrypi/pico-sdk)
 

@@ -6,7 +6,7 @@
 #include <stdio.h>  /* sprintf() */
 #include <string.h> /* strlen() */
 /* Timing decompr & render operations for framerate.*/
-#include "pico/time.h" /* get_absolute_timei(), absolute_time_diff_usi(). */
+#include "pico/time.h" /* get_absolute_time(), absolute_time_diff_us(), sleep_us() */
 
 
 /* SDK libraries */
