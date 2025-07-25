@@ -93,7 +93,7 @@ int LCD_video_1in8(void){
   uint frames_total = 0;
   char firstpass = 1;
   uint64_t delay_us;
-  
+
   
   /* Some preprocessor directives for conditional compilation.  */
   /* Compile decompression and rendering code according to which data header files are present. */
@@ -127,6 +127,7 @@ int LCD_video_1in8(void){
   uint64_t imgweav_us = 0;
   uint64_t u_decompr_us;
   uint64_t u_imgweav_us;
+  uint64_t delay_midblok_us;
   /* total time for testrun and data display: important if attempting to sync start of several picovideos*/
   uint64_t testrun_us; 
   
@@ -159,7 +160,7 @@ int LCD_video_1in8(void){
         if (frames_i==0){
 	  sleep_us(delay_us);
         }else{
-          sleep_us(delay_us + u_decompr_us);
+          sleep_us(delay_midblok_us);
         }
       }
       
@@ -192,7 +193,9 @@ int LCD_video_1in8(void){
 	if (render_us > requested)
 	  delay_us = 0;
 	else
-	  delay_us = requested - render_us;
+	  delay_us = requested - render_us;	
+	delay_midblok_us = delay_us + u_decompr_us;
+	
 	
         /* Paint_DrawRectangle(1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT, BLACK, DOT_PIXEL_1X1, DRAW_FILL_FULL);*/
         /* LCD_1IN8_Display(BlackImage);*/
@@ -204,7 +207,7 @@ int LCD_video_1in8(void){
         sprintf(outs[0],"u decompr us: %ld",u_decompr_us); 
         sprintf(outs[1],"u wvrendr us: %ld",u_imgweav_us); 
         sprintf(outs[2],"MAX F.RATE: %.6f",pow(10.0,6)/(render_us)); 
-        sprintf(outs[3]," requested: %.6f", FRAMERATE*1.0);
+        sprintf(outs[3]," requested: %.6f", (float) FRAMERATE);
         sprintf(outs[4],"  f delay us: %ld", delay_us);
         for (i=0; i<5; i++){
           Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
@@ -284,7 +287,7 @@ int LCD_video_1in8(void){
             outs[i] = (char *)malloc(23);
           sprintf(outs[0],"u render us: %ld", u_render_us); 
           sprintf(outs[1]," MAX F.RATE: %.6f", pow(10.0,6)/(u_render_us));
-          sprintf(outs[2],"  requested: %.6f", FRAMERATE*1.0);
+          sprintf(outs[2],"  requested: %.6f", (float) FRAMERATE);
           sprintf(outs[3],"fr delay us: %ld", delay_us);
           for (i=0; i<4; i++){
             Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
@@ -321,10 +324,10 @@ int LCD_video_1in8(void){
     start = get_absolute_time();
     Paint_DrawImage(frames[0],1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT);
     LCD_1IN8_Display(BlackImage);
-    uint64_t render_us = absolute_time_diff_us(start, get_absolute_time());
-    
-    uint64_t requested = round(pow(10.0,6)/FRAMERATE);
 
+    uint64_t render_us = absolute_time_diff_us(start, get_absolute_time());    
+    uint64_t requested = round(pow(10.0,6)/FRAMERATE);
+    
     if (render_us > requested)
       delay_us = 0;
     else
@@ -335,7 +338,7 @@ int LCD_video_1in8(void){
       outs[i] = (char *)malloc(23);
     sprintf(outs[0]," render us: %ld", render_us); 
     sprintf(outs[1],"MAX F.RATE: %.6f", pow(10.0,6)/(render_us)); 
-    sprintf(outs[2]," requested: %.6f", FRAMERATE*1.0); 
+    sprintf(outs[2]," requested: %.6f", (float) FRAMERATE); 
     sprintf(outs[3],"f delay us: %ld", delay_us); 
     for (i=0; i<4; i++){
       Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
