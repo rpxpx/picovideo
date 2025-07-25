@@ -157,9 +157,9 @@ int LCD_video_1in8(void){
         start = get_absolute_time();
       else{
         if (frames_i==0){
-	  sleep_us(delay_us-u_decompr_us);
+	  sleep_us(delay_us);
         }else{
-          sleep_us(delay_us);
+          sleep_us(delay_us + u_decompr_us);
         }
       }
       
@@ -204,7 +204,7 @@ int LCD_video_1in8(void){
         sprintf(outs[0],"u decompr us: %ld",u_decompr_us); 
         sprintf(outs[1],"u wvrendr us: %ld",u_imgweav_us); 
         sprintf(outs[2],"MAX F.RATE: %.6f",pow(10.0,6)/(render_us)); 
-        sprintf(outs[3]," requested: %.6f", FRAMERATE);
+        sprintf(outs[3]," requested: %.6f", FRAMERATE*1.0);
         sprintf(outs[4],"  f delay us: %ld", delay_us);
         for (i=0; i<5; i++){
           Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
@@ -284,7 +284,7 @@ int LCD_video_1in8(void){
             outs[i] = (char *)malloc(23);
           sprintf(outs[0],"u render us: %ld", u_render_us); 
           sprintf(outs[1]," MAX F.RATE: %.6f", pow(10.0,6)/(u_render_us));
-          sprintf(outs[2],"  requested: %.6f", FRAMERATE);
+          sprintf(outs[2],"  requested: %.6f", FRAMERATE*1.0);
           sprintf(outs[3],"fr delay us: %ld", delay_us);
           for (i=0; i<4; i++){
             Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
@@ -335,7 +335,7 @@ int LCD_video_1in8(void){
       outs[i] = (char *)malloc(23);
     sprintf(outs[0]," render us: %ld", render_us); 
     sprintf(outs[1],"MAX F.RATE: %.6f", pow(10.0,6)/(render_us)); 
-    sprintf(outs[2]," requested: %.6f", FRAMERATE); 
+    sprintf(outs[2]," requested: %.6f", FRAMERATE*1.0); 
     sprintf(outs[3],"f delay us: %ld", delay_us); 
     for (i=0; i<4; i++){
       Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
