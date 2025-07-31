@@ -320,26 +320,30 @@ int LCD_video_1in8(void){
   }else{
     /* LOOP VIDEO */
     /* Determine render t first for delay. */
-    uint i;      
-    start = get_absolute_time();
-    Paint_DrawImage(frames[0],1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT);
-    LCD_1IN8_Display(BlackImage);
 
-    uint64_t render_us = absolute_time_diff_us(start, get_absolute_time());    
+    
+    uint i;
+    start = get_absolute_time();
+    for (i=0; i<frames_total; i++){
+      Paint_DrawImage(frames[i],1,1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT);
+      LCD_1IN8_Display(BlackImage);
+    }
+    uint64_t render_us = absolute_time_diff_us(start, get_absolute_time());
+    uint64_t u_render_us = round(render_us/(float)frames_total);
     uint64_t requested = round(pow(10.0,6)/FRAMERATE);
     
-    if (render_us > requested)
+    if (u_render_us > requested)
       delay_us = 0;
     else
-      delay_us = requested - render_us;
+      delay_us = requested - u_render_us;
     
     char *outs[4];
     for (i=0; i<4; i++)
       outs[i] = (char *)malloc(23);
-    sprintf(outs[0]," render us: %ld", render_us); 
-    sprintf(outs[1],"MAX F.RATE: %.6f", pow(10.0,6)/(render_us)); 
-    sprintf(outs[2]," requested: %.6f", (float) FRAMERATE); 
-    sprintf(outs[3],"f delay us: %ld", delay_us); 
+    sprintf(outs[0],"u render us: %ld", u_render_us); 
+    sprintf(outs[1]," MAX F.RATE: %.6f", pow(10.0,6)/(u_render_us)); 
+    sprintf(outs[2],"  requested: %.6f", (float) FRAMERATE); 
+    sprintf(outs[3]," f delay us: %ld", delay_us); 
     for (i=0; i<4; i++){
       Paint_DrawString_EN(1, 16*(i+1), outs[i], &Font12, BLACK, WHITE);
       free(outs[i]);
