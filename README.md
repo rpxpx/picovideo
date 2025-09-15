@@ -55,9 +55,11 @@ For technical info, see: [https://www.waveshare.com/wiki/Pico-LCD-1.8](https://w
 
 ## Usage
 
-   `$ ./makevideo <framerate> <compression mode> [<overclock mode>] [<images>]`
+   `$ ./makevideo <framerate> <stagger> <compression mode> [<overclock mode>] [<images>]`
 
 Output appears in picovdeo as video.uf2. Copy this to Pico flash.
+
+Stagger is an initial delay specified in milliseconds. It enables staggered playback of an array of videos. A stagger value of greater than 0 extends display of the intial data frame. Enter 0 if unsure.
 
 Compression modes:<br>
 0: Raw data. Largest binary size, highest framerate.<br>
