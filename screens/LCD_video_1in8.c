@@ -216,7 +216,8 @@ int LCD_video_1in8(void){
         LCD_1IN8_Display(BlackImage);
 	firstpass = 0;
 	//end_testrun = get_absolute_time();
-        sleep_us(DATA_DISP_DELAY_US - absolute_time_diff_us(start, end_testrun));	
+        sleep_us(DATA_DISP_DELAY_US - absolute_time_diff_us(start, end_testrun));
+	sleep_ms(STAGGER);
       }
     }else{
       bloksZp += bloksZlen[bloks_i]; 
@@ -303,6 +304,7 @@ int LCD_video_1in8(void){
 	  //render_us = absolute_time_diff_us(start, end_testrun);
 	  //render_us = absolute_time_diff_us(start, end_testrun);
           sleep_us(DATA_DISP_DELAY_US - render_us);
+	  sleep_ms(STAGGER);
 	}
       }
     }
@@ -351,6 +353,7 @@ int LCD_video_1in8(void){
     LCD_1IN8_Display(BlackImage);
     //render_us = absolute_time_diff_us(start, get_absolute_time());
     sleep_us(DATA_DISP_DELAY_US - render_us);
+    sleep_ms(STAGGER);
     
     uint frames_i = 0;
     for (;;){
