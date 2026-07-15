@@ -36,7 +36,7 @@ if [[ $2 == "" ]] || ! [[ $2 =~ $re ]]; then
   exit 1
 fi
 echo "* Stagger: "$2" ms"
-echo "#define STAGGER "$1 >> ./Framerate.h
+echo "#define STAGGER "$2 >> ./Framerate.h
 
 
 # Compilation mode: no compression, simple compression, blokweave compression.
@@ -91,14 +91,14 @@ fi
 CFLAGS="-std=c89 -Wall -g -O0"
 
 # Choose compression method.
-if [ $2 == "2" ]; then
+if [ $3 == "2" ]; then
   echo "* Blokweave compression."
   echo "* Compiling compress-blokweave.c with ImageDataRaw.h and outputting compressed ImageDataBlokZ.h..."
   gcc $CFLAGS -I$LIBPRIMED_PATH compress-blokweav.c ImageDataRaw.c weave.c -L$LIBPRIMED_PATH -lprimed -lm -lz
   ./a.out
   rm a.out
 
-elif [ $2 == "1" ]; then
+elif [ $3 == "1" ]; then
   echo "* Single frame compression."
   echo "* Compiling compress-simpl.c with ImageDataRaw.h and outputting compressed ImageDataZ.h..."
   gcc $CFLAGS compress-singlefr.c ImageDataRaw.c -lz
