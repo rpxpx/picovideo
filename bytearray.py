@@ -61,9 +61,13 @@ def main():
             
             fo.write("{\n")
             for y in range(h):
-                for x in range(w):                
+                for x in range(w):
+                    # If greyscale
+                    if np.isscalar(img[y][x]):
+                        p = np.ones(3)*img[y][x]
+                    
                     # If transparent
-                    if len(img[y][x])>3 and img[y][x][3]==0:
+                    elif (len(img[y][x])>3 and img[y][x][3]==0):
                         p = np.array(BG)
                     else:
                         p = img[y][x][:3]
