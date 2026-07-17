@@ -13,7 +13,7 @@ Frame images should be prepared standardized to a screen size and for a desired 
 Sample images are provided in the ./imgs directory.
 
 
-![img1](imgs/eyes_160x130.png) ![img1](imgs/glider1_160x130.png) ![img2](imgs/horse_160x130.png) ![img3](imgs/bruegel_160x130.png)
+![img1](imgs/eyes_160x128.png) ![img1](imgs/glider1_160x128.png) ![img2](imgs/horse_160x128.png) ![img3](imgs/bruegel_160x128.png)
 
 Framerates up to 16.36 fps are possible.
 
