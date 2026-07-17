@@ -39,6 +39,8 @@ int main(){
   
   inta divs = divizors(frame_size);
   sort_inta(divs);
+  printf("divisors: ");
+  print_inta(divs);
   
   printf("Assuming free SRAM: %d\n", FREE_SRAM);
   printf("max frames in each blok: %d\n", num_max);
@@ -86,6 +88,7 @@ int main(){
         /* Compress the weave */
         zLen = frame_size*num; 
         compress(blokweaveZ, &zLen, (Bytef*)blokweave, frame_size*num);
+	printf("grain %d: %ld\n", grain, zLen);
         if (i==0 || zLen<zLen_best){
           grain_best = grain;
           zLen_best = zLen;

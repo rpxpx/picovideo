@@ -64,7 +64,7 @@ int LCD_video_1in8(void){
   /* Create a new image cache. */
   Paint_NewImage((UBYTE *)BlackImage, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT, 0, WHITE);
   Paint_SetScale(65);
-  Paint_SetRotate(ROTATE_0);
+  Paint_SetRotate(ROTATE_180);
   
   /* Splash screen polygon animation: Clearlight Systems / Jasnasvetlost Sistemi */
   sleep_ms(SPLASH_DELAY_MS);
@@ -80,7 +80,7 @@ int LCD_video_1in8(void){
   /*char logotext[] = "JASNASVETLOST SISTEMI";*/
   char logotext[] = "clearlight.systems";
   int tab = ((LCD_1IN8.WIDTH+1) - strlen(logotext)*Font12_WIDTH)/2; 
-  Paint_DrawString_EN(tab, LCD_1IN8.HEIGHT-Font12_HEIGHT, logotext, &Font12, BLACK, RED);
+  Paint_DrawString_EN(tab, LCD_1IN8.HEIGHT-Font12_HEIGHT, logotext, &Font12, RED, BLACK);
   LCD_1IN8_Display(BlackImage);
   
   sleep_ms(2300);
@@ -167,7 +167,7 @@ int LCD_video_1in8(void){
       /* Draw this frame. */      
       /* Each frame is picked out of the weave with four parameters: index, grain, period, number. */
       /* grain is the size (b) of each chunk */
-      Paint_DrawImageWeave((Byte*)blok, 0, 0, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT, frames_i, blokweave_grain[bloks_i], frame_size, num); 
+      Paint_DrawImageWeave((Byte*)blok, 0, 1, LCD_1IN8.WIDTH, LCD_1IN8.HEIGHT, frames_i, blokweave_grain[bloks_i], frame_size, num); 
       LCD_1IN8_Display(BlackImage);
       
       if (firstpass){

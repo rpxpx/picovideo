@@ -87,9 +87,9 @@ int main(void){
   fp = fopen(OUTHEDR, "w");
   fprintf(fp, "#ifndef %s\n", OUTHEDRPRE);
   fprintf(fp, "#define %s\n\n", OUTHEDRPRE);
-  fprintf(fp, "#define FRAME_WIDTH %d\n",160);
-  fprintf(fp, "#define FRAME_HEIGHT %d\n",130);
-  fprintf(fp, "#define FRAME_BITDEPTH %d\n",16);
+  fprintf(fp, "#define FRAME_WIDTH %d\n",FRAME_WIDTH);
+  fprintf(fp, "#define FRAME_HEIGHT %d\n",FRAME_HEIGHT);
+  fprintf(fp, "#define FRAME_BITDEPTH %d\n",FRAME_BITDEPTH);
   fprintf(fp, "extern const unsigned char framesZ[%ld];\n", framesZ_size);
   fprintf(fp, "extern const unsigned long framesZlen[%d];\n", frame_count);   
   fprintf(fp, "#endif\n");
